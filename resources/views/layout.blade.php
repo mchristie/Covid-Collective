@@ -50,7 +50,7 @@
                 <div class="col-sm-7">
                     <p class="text-muted text-small text-small">
                         Covid Collective is voluntary organisation and it would be most uncool to sue us.<br>
-                        Our content is accurate only to our best of our effort and is provided in good faith.
+                        Our content is accurate only to the best of our effort and is provided in good faith.
                     </p>
                 </div>
                 <div class="col-sm-5">
