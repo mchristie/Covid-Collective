@@ -15,3 +15,10 @@
 .text-small {
     font-size: 0.8em;
 }
+
+a.muted-link {
+    color: inherit
+}
+a.muted-link:hover {
+    color: #007bff;
+}

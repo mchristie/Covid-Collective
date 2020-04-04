@@ -5,14 +5,44 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Covid Collective</title>
-
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
     integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     
     <link href="https://fonts.googleapis.com/css?family=Lato:400,700&display=swap" rel="stylesheet">
 
     <link href="{{mix('css/app.css')}}" rel="stylesheet">
+
+    @php
+        $title = isset($title) ? 'Covid Collective | '.$title : 'Covid Collective';
+        $description = $description ?? 'Covid Collective';
+        $image = $image ?? url('/images/title-large.png');
+        $url = $url ?? Request::url();
+    @endphp
+
+    <title>{{$title}}</title>
+    <meta name="description" content="{{$description}}">
+    <meta name=”robots” content="index, follow">
+    
+    <!-- Schema.org markup for Google+ -->
+    <meta itemprop="name" content="{{$title}}">
+    <meta itemprop="description" content="{{$description}}">
+    <meta itemprop="image" content="{{$image}}">
+    
+    <!-- Twitter Card data -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@Covid_Collectiv">
+    <meta name="twitter:title" content="{{$title}}">
+    <meta name="twitter:description" content="{{$description}}">
+    <meta name="twitter:creator" content="@Covid_Collectiv">
+    <meta name="twitter:image" content="{{$image}}">
+    
+    <!-- Open Graph data -->
+    <meta property="og:title" content="{{$title}}" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="{{$url}}" />
+    <meta property="og:image" content="{{$image}}" />
+    <meta property="og:description" content="{{$description}}" />
+    <meta property="og:site_name" content="Covid Collective" />
 
 </head>
 
@@ -56,26 +86,39 @@
                 <div class="col-sm-5">
                     <p class="text-right text-muted text-small">
                     
-                        <a href="{{ route('home') }}" class="text-reset">
+                        <a href="{{ route('home') }}" class="muted-link">
                             Home
                         </a>
                         &nbsp; | &nbsp;
-                        <a href="{{ route('groups') }}" class="text-reset">
+                        <a href="{{ route('groups') }}" class="muted-link">
                             Groups
                         </a>
                         &nbsp; | &nbsp;
-                        <a href="{{ route('resources') }}" class="text-reset">
+                        <a href="{{ route('resources') }}" class="muted-link">
                             Resources
                         </a>
                         &nbsp; | &nbsp;
-                        <a href="{{ route('volunteer') }}" class="text-reset">
+                        <a href="{{ route('volunteer') }}" class="muted-link">
                             Volunteer
                         </a>
                         &nbsp; | &nbsp;
-                        <a href="{{ route('help') }}" class="text-reset">
+                        <a href="{{ route('help') }}" class="muted-link">
                             Help
                         </a>
                         
+                    </p>
+                    <p class="text-right text-muted text-small">
+                        <a target="_blank" href="https://twitter.com/Covid_Collectiv" class="muted-link">
+                            <i class="fab fa-twitter"></i>
+                            &nbsp;
+                            @Covid_Collectiv
+                        </a>
+                        &nbsp; | &nbsp;
+                        <a target="_blank" href="https://www.facebook.com/CovidCollectiveUK" class="muted-link">
+                            <i class="fab fa-facebook-f"></i>
+                            &nbsp;
+                            @CovidCollectiveUK
+                        </a>
                     </p>
                 </div>
             </div>

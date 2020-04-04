@@ -1,4 +1,7 @@
-@extends('layout')
+@extends('layout', [
+    'title' => 'Support Groups',
+    'description' => 'There are thousands of local groups supporting people in their area, find yours now.'
+])
 
 @section('content')
 

@@ -1,4 +1,7 @@
-@extends('layout')
+@extends('layout', [
+    'title' => 'Resources',
+    'description' => 'We\'ve collected loads of online resources to help everyone from parents to businesses through self-isolation, you\'ll find them all here'
+])
 
 @section('content')
 

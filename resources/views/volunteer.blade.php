@@ -1,4 +1,8 @@
-@extends('layout')
+@extends('layout', [
+    'title' => 'Volunteer',
+    'description' => "We're working on tools to help people support those in need, if you'd like to be updated when these are available enter
+    your email address below and we'll let you know."
+])
 
 @section('content')
 
