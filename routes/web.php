@@ -130,3 +130,19 @@ Route::post('/volunteer', function (Request $request) {
 Route::get('/ways-to-help', function (Request $request) {
     return view('help');
 })->name('help');
+
+/*
+ *  SEO
+ */
+
+Route::get('/robots.txt', function (Request $request) {
+    return response("User-agent: *\nAllow: /\n\nSitemap: ".route('sitemap'), 200, [
+        'Content-Type' => 'text/plain'
+    ]);
+})->name('robots');
+
+Route::get('/sitemap.xml', function (Request $request) {
+    return response(view('sitemap')->render(), 200, [
+        'Content-Type' => 'text/xml'
+    ]);
+})->name('sitemap');
