@@ -31,6 +31,9 @@ class AppServiceProvider extends ServiceProvider
         }
 
         URL::forceRootUrl(config('app.url'));
+        if (app()->environment('production')) {
+            URL::forceScheme('https');
+        }
 
         Blade::directive('icon', function ($expression) {
             return <<<EOL
