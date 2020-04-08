@@ -20,7 +20,7 @@ use App\Mail\VolunteerSignedUp;
 Route::get('/', function (Request $request) {
     // return view('soon');
     return view('home');
-})->name('home');
+})->name('home')->middleware('cache.headers:public;max_age=3600');
 
 /*
  *  Resources
@@ -31,7 +31,7 @@ Route::get('/resources', function (Request $request, ResourcesQuery $resources) 
         'resources' => $resources->getResources($request->all()),
         'selected' => $request->all()
     ]);
-})->name('resources');
+})->name('resources')->middleware('cache.headers:public;max_age=300');
 
 Route::post('/resources/add', function (Request $request, CommandBus $bus, ResourcesQuery $resources) {
     $validator = Validator::make($request->all(), [
@@ -87,7 +87,7 @@ Route::post('/resources/add', function (Request $request, CommandBus $bus, Resou
 
 Route::get('/resources/add', function (Request $request) {
     return view('addResource', $request->all());
-})->name('addResource');
+})->name('addResource')->middleware('cache.headers:public;max_age=3600');
 
 /*
  *  Groups
@@ -97,7 +97,7 @@ Route::get('/groups', function (Request $request, Groups $groups) {
     return view('groups', [
         'groups' => $groups->getGroups()
     ]);
-})->name('groups');
+})->name('groups')->middleware('cache.headers:public;max_age=3600');
 
 /*
  *  Volunteer
@@ -107,7 +107,7 @@ Route::get('/volunteer', function (Request $request) {
     return view('volunteer', [
         'thanks' => $request->get('thanks')
     ]);
-})->name('volunteer');
+})->name('volunteer')->middleware('cache.headers:public;max_age=3600');
 
 
 Route::post('/volunteer', function (Request $request) {
@@ -129,7 +129,7 @@ Route::post('/volunteer', function (Request $request) {
 
 Route::get('/ways-to-help', function (Request $request) {
     return view('help');
-})->name('help');
+})->name('help')->middleware('cache.headers:public;max_age=3600');
 
 /*
  *  SEO
@@ -139,10 +139,10 @@ Route::get('/robots.txt', function (Request $request) {
     return response("User-agent: *\nAllow: /\n\nSitemap: ".route('sitemap'), 200, [
         'Content-Type' => 'text/plain'
     ]);
-})->name('robots');
+})->name('robots')->middleware('cache.headers:public;max_age=3600');
 
 Route::get('/sitemap.xml', function (Request $request) {
     return response(view('sitemap')->render(), 200, [
         'Content-Type' => 'text/xml'
     ]);
-})->name('sitemap');
+})->name('sitemap')->middleware('cache.headers:public;max_age=3600');
