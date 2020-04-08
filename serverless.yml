@@ -116,7 +116,7 @@ resources:
                         TargetOriginId: API
                         DefaultTTL: 0
                         MinTTL: 0
-                        MaxTTL: 0
+                        MaxTTL: 3600
                         ForwardedValues:
                             QueryString: true
                             Cookies:
@@ -130,7 +130,10 @@ resources:
                     CacheBehaviors:
                         -   PathPattern: 'css/*'
                             TargetOriginId: Assets
-                            AllowedMethods: [GET, HEAD]
+                            DefaultTTL: 900
+                            MinTTL: 60
+                            MaxTTL: 3600
+                            AllowedMethods: [GET, HEAD, OPTIONS]
                             ForwardedValues:
                                 QueryString: 'false'
                                 Cookies:
@@ -139,7 +142,10 @@ resources:
                             Compress: true
                         -   PathPattern: 'js/*'
                             TargetOriginId: Assets
-                            AllowedMethods: [GET, HEAD]
+                            DefaultTTL: 900
+                            MinTTL: 60
+                            MaxTTL: 3600
+                            AllowedMethods: [GET, HEAD, OPTIONS]
                             ForwardedValues:
                                 QueryString: 'false'
                                 Cookies:
