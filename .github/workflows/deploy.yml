@@ -90,3 +90,7 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_SECRET }}
         AWS_REGION: 'eu-west-1'
         SOURCE_DIR: 'public'
+
+    - name: Invalidate the CloudFront cache
+      run: |
+        aws cloudfront create-invalidation --distribution-id E3HKQ9623EAJ6W --paths /*
