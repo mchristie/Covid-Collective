@@ -2,6 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use DateTimeImmutable;
+use Covid\Users\Domain\UserId;
+use Covid\Users\Domain\PhoneNumber;
+use Covid\Users\Domain\Name;
+use Covid\Users\Domain\Email;
+use Covid\Users\Application\Commands\RegisterUser;
 use Covid\Shared\CommandBus;
 use Covid\Resources\Domain\Url;
 use Covid\Resources\Domain\Title;
@@ -53,4 +59,22 @@ Route::get('groups', function(Groups $groups) {
 
 Route::get('groups/{groupId}', function($groupId, Groups $groups) {
     return $groups->getGroupById(new GroupId($groupId));
+});
+
+Route::post('users/register', function(Request $request, CommandBus $commandBus) {
+    $request->validate([
+        'name' => 'required',
+        'email' => 'required_without:phone',
+        'phone' => 'required_without:email',
+    ]);
+
+    $command = new RegisterUser(
+        UserId::new(),
+        new Name($request->get('name')),
+        $request->get('email') ? new Email($request->get('email')) : null,
+        $request->get('phone') ? new PhoneNumber($request->get('phone')) : null,
+        new DateTimeImmutable()
+    );
+
+    $commandBus->dispatch($command);
 });

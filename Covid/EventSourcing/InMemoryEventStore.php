@@ -32,9 +32,9 @@ class InMemoryEventStore implements EventStore
         return $this->store->loadFromPlayhead($id, $playhead);
     }
 
-    public function append($id, DomainEventStream $eventStream)
+    public function append($id, DomainEventStream $eventStream): void
     {
-        return $this->store->append($id, $eventStream);
+        $this->store->append($id, $eventStream);
     }
 
 }

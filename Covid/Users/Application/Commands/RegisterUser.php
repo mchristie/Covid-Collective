@@ -1,16 +1,15 @@
 <?php
 
-namespace Covid\Users\Domain\Events;
+namespace Covid\Users\Application\Commands;
 
-use Symfony\Component\Console\Descriptor\Descriptor;
 use DateTimeImmutable;
 use Covid\Users\Domain\UserId;
 use Covid\Users\Domain\PhoneNumber;
 use Covid\Users\Domain\Name;
 use Covid\Users\Domain\Email;
 
-final class UserWasRegistered
-{
+class RegisterUser {
+
     private $userId;
     private $name;
     private $email;
@@ -54,29 +53,5 @@ final class UserWasRegistered
     public function getRegisteredAt(): DateTimeImmutable
     {
         return $this->registeredAt;
-    }
-
-    public function serialize(): string
-    {
-        return json_encode([
-            'userId' => (string)$this->userId,
-            'name' => (string)$this->name,
-            'email' => $this->email ? (string)$this->email : null,
-            'phone' => $this->phone ? (string)$this->phone : null,
-            'registeredAt' => $this->registeredAt->format('Y-m-d H:i:s'),
-        ]);
-    }
-
-    public static function deserialize(string $json): UserWasRegistered
-    {
-        $payload = json_decode($json);
-
-        return new UserWasRegistered(
-            new UserId($payload->userId),
-            new Name($payload->name),
-            $payload->email ? new Email($payload->email) : null,
-            $payload->phone ? new PhoneNumber($payload->phone) : null,
-            new DateTimeImmutable($payload->registeredAt)
-        );
     }
 }

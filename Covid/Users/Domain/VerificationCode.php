@@ -22,9 +22,16 @@ abstract class VerificationCode
         return $this->code;
     }
 
-    public function new()
+    public static function new()
     {
-        return new static((string)rand(100000, 999999));
+        return new static(implode('', [
+            rand(0, 9),
+            rand(0, 9),
+            rand(0, 9),
+            rand(0, 9),
+            rand(0, 9),
+            rand(0, 9),
+        ]));
     }
 
 }
