@@ -2,9 +2,9 @@
 
 namespace Covid\Users\Domain\Exceptions;
 
-use Exception;
+use Covid\Shared\BaseException;
 
-class PhoneNumberWasInvalid extends Exception
+class PhoneNumberWasInvalid extends BaseException
 {
     //
 }

@@ -3,7 +3,16 @@
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use Covid\Users\Domain\UsersQuery;
+use Covid\Users\Domain\UserRepository;
+use Covid\Users\Domain\UserId;
+use Covid\Users\Domain\PhoneNumber;
+use Covid\Users\Domain\PasswordHelper;
+use Covid\Users\Domain\Password;
+use Covid\Users\Domain\Exceptions\EmailOrPhoneIsRequired;
+use Covid\Users\Domain\Email;
 use Covid\Shared\CommandBus;
+use Covid\Shared\BaseException;
 use Covid\Resources\Domain\Url;
 use Covid\Resources\Domain\Title;
 use Covid\Resources\Domain\ResourceId;
@@ -130,6 +139,75 @@ Route::post('/volunteer', function (Request $request) {
 Route::get('/ways-to-help', function (Request $request) {
     return view('help');
 })->name('help')->middleware('cache.headers:public;max_age=3600');
+
+/*
+ * Users
+ */
+
+Route::any('login', function(Request $request, UsersQuery $query, UserRepository $repo, PasswordHelper $passwordHelper) {
+
+    $error = null;
+    $emailOrPhone = $request->get('emailOrPhone');
+
+    if ($request->getMethod() === 'POST' && $request->get('password')) {
+        $phone = null;
+        $email = null;
+
+        try {
+
+            if (strstr($emailOrPhone, '@')) {
+                $email = new Email($emailOrPhone);
+
+            } elseif (strstr($emailOrPhone, '7')) {
+                $phone = new PhoneNumber($emailOrPhone);
+
+            } else {
+                throw new EmailOrPhoneIsRequired();
+            }
+
+            $password = new Password($request->get('password'));
+
+            $user = $query->findByEmailOrPhoneNumber(
+                $email,
+                $phone,
+            );
+
+            $user = $repo->find(new UserId($user['id']));
+            
+            if ($user->checkPassword($password, $passwordHelper)) {
+                $request->session()->put('userId', $user->getAggregateRootId());
+                $request->session()->save();
+                
+                return redirect()->route('profile');
+            } else {
+                $error = 'Sorry, your password was incorrect';
+            }
+
+        } catch(BaseException $e) {
+            $error = $e->getName();
+
+        } catch(Exception $e) {
+            $error = $e->getMessage();
+        }
+    }
+
+    return view('login', [
+        'error' => $error,
+        'emailOrPhone' => $emailOrPhone
+    ]);
+})->name('login')->middleware('cache.headers:public;max_age=3600');
+
+Route::get('profile', function(Request $request, UsersQuery $query) {
+    if (!$request->session()->get('userId')) {
+        return redirect()->route('login');
+    };
+    
+    $user = $query->find(new UserId($request->session()->get('userId')));
+    
+    return view('profile', [
+        'user' => $user
+    ]);
+})->name('profile');
 
 /*
  *  SEO

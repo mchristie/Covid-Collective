@@ -2,9 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
-use DateTimeImmutable;
 use Covid\Users\Domain\UserId;
 use Covid\Users\Domain\PhoneNumber;
+use Covid\Users\Domain\Password;
 use Covid\Users\Domain\Name;
 use Covid\Users\Domain\Email;
 use Covid\Users\Application\Commands\RegisterUser;
@@ -66,6 +66,7 @@ Route::post('users/register', function(Request $request, CommandBus $commandBus)
         'name' => 'required',
         'email' => 'required_without:phone',
         'phone' => 'required_without:email',
+        'password' => 'required',
     ]);
 
     $command = new RegisterUser(
@@ -73,6 +74,7 @@ Route::post('users/register', function(Request $request, CommandBus $commandBus)
         new Name($request->get('name')),
         $request->get('email') ? new Email($request->get('email')) : null,
         $request->get('phone') ? new PhoneNumber($request->get('phone')) : null,
+        new Password($request->get('password')),
         new DateTimeImmutable()
     );
 

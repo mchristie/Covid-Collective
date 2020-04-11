@@ -4,8 +4,14 @@ namespace Covid\USers\Domain;
 
 use RuntimeException;
 use DateTimeImmutable;
+use Covid\Users\Domain\UsersQuery;
 use Covid\Users\Domain\PhoneNumber;
+use Covid\Users\Domain\PasswordHelper;
+use Covid\Users\Domain\Password;
 use Covid\Users\Domain\Name;
+use Covid\Users\Domain\HashedPassword;
+use Covid\Users\Domain\Exceptions\UserNotFound;
+use Covid\Users\Domain\Exceptions\UserAlreadyExists;
 use Covid\Users\Domain\Exceptions\EmailOrPhoneIsRequired;
 use Covid\Users\Domain\Events\UserWasRegistered;
 use Broadway\EventSourcing\EventSourcedAggregateRoot;
@@ -24,7 +30,7 @@ final class User extends EventSourcedAggregateRoot
     private $phoneNumberVerified = false;
     private $phoneNumberVerificationCode;
 
-    private $registeredAt;
+    private $hashedPassword;
 
     /*
      * Getters
@@ -84,13 +90,25 @@ final class User extends EventSourcedAggregateRoot
         Name $name,
         ?Email $email,
         ?PhoneNumber $phoneNumber,
-        DateTimeImmutable $registeredAt
+        Password $password,
+        DateTimeImmutable $registeredAt,
+        UsersQuery $userQuery,
+        PasswordHelper $hasher
     ) {
         if (!$email && !$phoneNumber) {
             throw new EmailOrPhoneIsRequired();
         }
+
+        try {
+            $userQuery->findByEmailOrPhoneNumber($email, $phoneNumber);
+            throw new UserAlreadyExists();
+        } catch (UserNotFound $exception) {
+            // Ideal
+        }
         
         $user = new static;
+
+        $hashedPassword = $hasher->hash($password);
 
         $user->apply(
             new UserWasRegistered(
@@ -98,11 +116,17 @@ final class User extends EventSourcedAggregateRoot
                 $name,
                 $email,
                 $phoneNumber,
+                $hashedPassword,
                 $registeredAt
             )
         );
 
         return $user;
+    }
+
+    public function checkPassword(Password $password, PasswordHelper $helper)
+    {
+        return $helper->check($this->hashedPassword, $password);
     }
 
     /*
@@ -115,6 +139,7 @@ final class User extends EventSourcedAggregateRoot
         $this->name = $event->getName();
         $this->email = $event->getEmail();
         $this->phoneNumber = $event->getPhoneNumber();
+        $this->hashedPassword = $event->getHashedPassword();
         $this->registeredAt = $event->getRegisteredAt();
     }
 

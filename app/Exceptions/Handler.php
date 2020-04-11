@@ -2,8 +2,19 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use ReflectionClass;
+use Reflection;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Covid\Users\Domain\Exceptions\UserNotFound;
+use Covid\Users\Domain\Exceptions\UserAlreadyExists;
+use Covid\Users\Domain\Exceptions\PhoneNumberWasInvalid;
+use Covid\Users\Domain\Exceptions\PasswordNotStrongEnough;
+use Covid\Users\Domain\Exceptions\NameWasInvalid;
+use Covid\Users\Domain\Exceptions\EmailWasInvalid;
+use Covid\Users\Domain\Exceptions\EmailOrPhoneIsRequired;
+use Covid\Users\Domain\Exceptions\CodeWasInvalid;
+use Covid\Shared\BaseException;
 
 class Handler extends ExceptionHandler
 {
@@ -50,6 +61,28 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+        switch(get_class($exception)) {
+            case CodeWasInvalid::class:
+            case EmailOrPhoneIsRequired::class:
+            case EmailWasInvalid::class:
+            case NameWasInvalid::class:
+            case PasswordNotStrongEnough::class:
+            case PhoneNumberWasInvalid::class:
+            case UserAlreadyExists::class:
+            case UserNotFound::class:
+            return response(json_encode([
+                    'error' => $exception->getName()
+                ]), 400);
+                
+            default:
+                return response(json_encode([
+                    'error' => $exception->getMessage()
+                ]), 400);
+            break;
+
+        }
+
         return parent::render($request, $exception);
     }
+
 }

@@ -5,6 +5,7 @@ namespace Covid\Users\Application\Commands;
 use DateTimeImmutable;
 use Covid\Users\Domain\UserId;
 use Covid\Users\Domain\PhoneNumber;
+use Covid\Users\Domain\Password;
 use Covid\Users\Domain\Name;
 use Covid\Users\Domain\Email;
 
@@ -14,6 +15,7 @@ class RegisterUser {
     private $name;
     private $email;
     private $phone;
+    private $password;
     private $registeredAt;
 
     public function __construct(
@@ -21,12 +23,14 @@ class RegisterUser {
         Name $name,
         ?Email $email,
         ?PhoneNumber $phone,
+        Password $password,
         DateTimeImmutable $registeredAt
     ) {
         $this->userId = $userId;
         $this->name = $name;
         $this->email = $email;
         $this->phone = $phone;
+        $this->password = $password;
         $this->registeredAt = $registeredAt;
     }
 
@@ -48,6 +52,11 @@ class RegisterUser {
     public function getPhoneNumber():? PhoneNumber
     {
         return $this->phone;
+    }
+
+    public function getPassword(): Password
+    {
+        return $this->password;
     }
 
     public function getRegisteredAt(): DateTimeImmutable

@@ -1,8 +1,10 @@
 <?php
 namespace Covid\Users\Application\Commands;
 
+use Covid\Users\Domain\UsersQuery;
 use Covid\Users\Domain\UserRepository;
 use Covid\Users\Domain\User;
+use Covid\Users\Domain\PasswordHelper;
 use Covid\Users\Application\Commands\RegisterUser;
 use Broadway\CommandHandling\SimpleCommandHandler;
 
@@ -10,10 +12,14 @@ class UsersCommandHandler extends SimpleCommandHandler
 {
 
     private $users;
+    private $usersQuery;
+    private $PasswordHelper;
 
-    public function __construct(UserRepository $users)
+    public function __construct(UserRepository $users, UsersQuery $usersQuery, PasswordHelper $PasswordHelper)
     {
         $this->users  = $users;
+        $this->usersQuery  = $usersQuery;
+        $this->PasswordHelper  = $PasswordHelper;
     }
 
     public function handleRegisterUser(RegisterUser $command)
@@ -23,7 +29,10 @@ class UsersCommandHandler extends SimpleCommandHandler
             $command->getName(),
             $command->getEmail(),
             $command->getPhoneNumber(),
-            $command->getRegisteredAt()
+            $command->getPassword(),
+            $command->getRegisteredAt(),
+            $this->usersQuery,
+            $this->PasswordHelper
         );
 
         $this->users->save($user);

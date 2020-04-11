@@ -2,9 +2,9 @@
 
 namespace Covid\Users\Domain\Exceptions;
 
-use Exception;
+use Covid\Shared\BaseException;
 
-class EmailOrPhoneIsRequired extends Exception
+class EmailOrPhoneIsRequired extends BaseException
 {
     //
 }

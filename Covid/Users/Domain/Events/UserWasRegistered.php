@@ -7,6 +7,7 @@ use DateTimeImmutable;
 use Covid\Users\Domain\UserId;
 use Covid\Users\Domain\PhoneNumber;
 use Covid\Users\Domain\Name;
+use Covid\Users\Domain\HashedPassword;
 use Covid\Users\Domain\Email;
 
 final class UserWasRegistered
@@ -15,6 +16,7 @@ final class UserWasRegistered
     private $name;
     private $email;
     private $phone;
+    private $hashedPassword;
     private $registeredAt;
 
     public function __construct(
@@ -22,12 +24,14 @@ final class UserWasRegistered
         Name $name,
         ?Email $email,
         ?PhoneNumber $phone,
+        HashedPassword $hashedPassword,
         DateTimeImmutable $registeredAt
     ) {
         $this->userId = $userId;
         $this->name = $name;
         $this->email = $email;
         $this->phone = $phone;
+        $this->hashedPassword = $hashedPassword;
         $this->registeredAt = $registeredAt;
     }
 
@@ -51,6 +55,11 @@ final class UserWasRegistered
         return $this->phone;
     }
 
+    public function getHashedPassword():? HashedPassword
+    {
+        return $this->hashedPassword;
+    }
+
     public function getRegisteredAt(): DateTimeImmutable
     {
         return $this->registeredAt;
@@ -63,6 +72,7 @@ final class UserWasRegistered
             'name' => (string)$this->name,
             'email' => $this->email ? (string)$this->email : null,
             'phone' => $this->phone ? (string)$this->phone : null,
+            'hashedPassword' => (string) $this->hashedPassword,
             'registeredAt' => $this->registeredAt->format('Y-m-d H:i:s'),
         ]);
     }
@@ -76,6 +86,7 @@ final class UserWasRegistered
             new Name($payload->name),
             $payload->email ? new Email($payload->email) : null,
             $payload->phone ? new PhoneNumber($payload->phone) : null,
+            new HashedPassword($payload->hashedPassword),
             new DateTimeImmutable($payload->registeredAt)
         );
     }

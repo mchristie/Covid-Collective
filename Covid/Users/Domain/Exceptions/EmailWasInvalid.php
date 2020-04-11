@@ -2,9 +2,9 @@
 
 namespace Covid\Users\Domain\Exceptions;
 
-use Exception;
+use Covid\Shared\BaseException;
 
-class EmailWasInvalid extends Exception
+class EmailWasInvalid extends BaseException
 {
     //
 }

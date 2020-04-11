@@ -2,9 +2,9 @@
 
 namespace Covid\Users\Domain\Exceptions;
 
-use Exception;
+use Covid\Shared\BaseException;
 
-class CodeWasInvalid extends Exception
+class CodeWasInvalid extends BaseException
 {
     //
 }
