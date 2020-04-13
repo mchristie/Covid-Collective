@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
-use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Covid\Users\Domain\UsersQuery;
+use Covid\Users\Domain\UserId;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -23,8 +25,19 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->registerPolicies();
+        // $this->registerPolicies();
+        
+        $this->app->rebinding('request', function ($app, $request) {
+            $request->setUserResolver(function() use($app, $request) {
+                if (!$request->session()->has('userId')) {
+                    return null;
+                }
+                $users = $app->get(UsersQuery::class);
+                
+                $userId = new UserId($request->session()->get('userId'));
 
-        //
+                return $users->find($userId);
+            });
+        });
     }
 }

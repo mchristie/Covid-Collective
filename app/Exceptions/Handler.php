@@ -6,6 +6,7 @@ use Throwable;
 use ReflectionClass;
 use Reflection;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Auth\AuthenticationException;
 use Covid\Users\Domain\Exceptions\UserNotFound;
 use Covid\Users\Domain\Exceptions\UserAlreadyExists;
 use Covid\Users\Domain\Exceptions\PhoneNumberWasInvalid;
@@ -62,6 +63,11 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception)
     {
         switch(get_class($exception)) {
+
+            case AuthenticationException::class:
+                return redirect($exception->redirectTo());
+            break;
+
             case CodeWasInvalid::class:
             case EmailOrPhoneIsRequired::class:
             case EmailWasInvalid::class:
@@ -79,7 +85,6 @@ class Handler extends ExceptionHandler
                     'error' => $exception->getMessage()
                 ]), 400);
             break;
-
         }
 
         return parent::render($request, $exception);

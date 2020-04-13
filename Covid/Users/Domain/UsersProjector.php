@@ -4,6 +4,7 @@ namespace Covid\Users\Domain;
 
 use Illuminate\Database\Connection;
 use Covid\Users\Domain\UserRepository;
+use Covid\Users\Domain\Events\UserWasUpdated;
 use Covid\Users\Domain\Events\UserWasRegistered;
 use Broadway\ReadModel\Projector;
 
@@ -32,6 +33,19 @@ class UsersProjector extends Projector
                 'registeredAt'  => $event->getRegisteredAt()->format('Y-m-d H:i:s'),
             ]
         );
+    }
+
+    public function applyUserWasUpdated(UserWasUpdated $event)
+    {
+        $this->db->table('users')
+                ->where('id', (string) $event->getUserId())
+                ->limit(1)
+                ->update([
+                    'name'                  => (string) $event->getName(),
+                    'seekingAssistance'     => (string) $event->getSeekingAssistance(),
+                    'offeringAssistance'    => (string) $event->getOfferingAssistance(),
+                    'updatedAt'             => $event->getUpdatedAt()->format('Y-m-d H:i:s'),
+                ]);
     }
 
 

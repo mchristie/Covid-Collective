@@ -4,30 +4,17 @@ namespace Covid\Users\Domain;
 
 use RuntimeException;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\InvalidArgumentException;
+use PHPUnit\Framework\ExpectationFailedException;
 use DateTimeImmutable;
 use Covid\Users\Domain\Password;
+use Covid\Users\Domain\Exceptions\UserAlreadyExists;
 use Covid\Users\Domain\Exceptions\EmailOrPhoneIsRequired;
 use Covid\Users\Application\Query\InMemoryUsersQuery;
+use Covid\USers\Domain\User;
 
 class UserTest extends TestCase
 {
-
-    public function test_user_create()
-    {
-        $user = User::register(
-            UserId::new(),
-            new Name('Malcolm'),
-            new Email('malcolm@christiesmedia.co.uk'),
-            new PhoneNumber('07825600704'),
-            new Password('Hello world'),
-            new DateTimeImmutable(),
-            new InMemoryUsersQuery(),
-            $this->getHasher()
-        );
-
-        $this->assertInstanceOf(User::class, $user);
-        $this->assertEquals('+447825600704', (string)$user->getPhoneNumber());
-    }
 
     public function test_user_needs_name_or_email()
     {
@@ -67,6 +54,47 @@ class UserTest extends TestCase
             new InMemoryUsersQuery(),
             $this->getHasher()
         );
+    }
+
+    public function test_user_create()
+    {
+        $user = User::register(
+            UserId::new(),
+            new Name('Malcolm'),
+            new Email('malcolm@christiesmedia.co.uk'),
+            new PhoneNumber('07825600704'),
+            new Password('Hello world'),
+            new DateTimeImmutable(),
+            new InMemoryUsersQuery(),
+            $this->getHasher()
+        );
+
+        $this->assertInstanceOf(User::class, $user);
+        $this->assertEquals('+447825600704', (string)$user->getPhoneNumber());
+
+        return $user;
+    }
+    
+    /**
+     * @depends test_user_create
+     */
+    public function test_user_update(User $user)
+    {
+        $user->update(
+            UserId::new(),
+            new Name('Malcolm'),
+            new SeekingAssistance('yes'),
+            new OfferingAssistance('no'),
+            new Password('Hello world'),
+            new DateTimeImmutable(),
+            $this->getHasher()
+        );
+
+        $this->assertInstanceOf(User::class, $user);
+        $this->assertEquals('YES', (string) $user->getSeekingAssistance());
+        $this->assertEquals('NO', (string) $user->getOfferingAssistance());
+
+        return $user;
     }
 
     private function getHasher(): PasswordHelper

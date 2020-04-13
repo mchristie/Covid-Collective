@@ -5,14 +5,17 @@ namespace Covid\USers\Domain;
 use RuntimeException;
 use DateTimeImmutable;
 use Covid\Users\Domain\UsersQuery;
+use Covid\Users\Domain\SeekingAssistance;
 use Covid\Users\Domain\PhoneNumber;
 use Covid\Users\Domain\PasswordHelper;
 use Covid\Users\Domain\Password;
+use Covid\Users\Domain\OfferingAssistance;
 use Covid\Users\Domain\Name;
 use Covid\Users\Domain\HashedPassword;
 use Covid\Users\Domain\Exceptions\UserNotFound;
 use Covid\Users\Domain\Exceptions\UserAlreadyExists;
 use Covid\Users\Domain\Exceptions\EmailOrPhoneIsRequired;
+use Covid\Users\Domain\Events\UserWasUpdated;
 use Covid\Users\Domain\Events\UserWasRegistered;
 use Broadway\EventSourcing\EventSourcedAggregateRoot;
 
@@ -31,6 +34,9 @@ final class User extends EventSourcedAggregateRoot
     private $phoneNumberVerificationCode;
 
     private $hashedPassword;
+
+    private $seekingAssistance;
+    private $offeringAssistance;
 
     /*
      * Getters
@@ -81,6 +87,16 @@ final class User extends EventSourcedAggregateRoot
         return $this->phoneNumberVerificationCode;
     }
 
+    public function getSeekingAssistance():? SeekingAssistance
+    {
+        return $this->seekingAssistance;
+    }
+
+    public function getOfferingAssistance():? OfferingAssistance
+    {
+        return $this->offeringAssistance;
+    }
+
     /*
      * Methods
      */
@@ -124,6 +140,29 @@ final class User extends EventSourcedAggregateRoot
         return $user;
     }
 
+    public function update(
+        UserId $userId,
+        Name $name,
+        SeekingAssistance $seekingAssistance,
+        OfferingAssistance $offeringAssistance,
+        ?Password $password,
+        DateTimeImmutable $updatedAt,
+        PasswordHelper $hasher
+    ) {
+        $this->apply(
+            new UserWasUpdated(
+                $userId,
+                $name,
+                $seekingAssistance,
+                $offeringAssistance,
+                $password ? $hasher->hash($password) : null,
+                $updatedAt
+            )
+        );
+
+        return $this;
+    }
+
     public function checkPassword(Password $password, PasswordHelper $helper)
     {
         return $helper->check($this->hashedPassword, $password);
@@ -141,6 +180,16 @@ final class User extends EventSourcedAggregateRoot
         $this->phoneNumber = $event->getPhoneNumber();
         $this->hashedPassword = $event->getHashedPassword();
         $this->registeredAt = $event->getRegisteredAt();
+    }
+
+    protected function applyUserWasUpdated(UserWasUpdated $event)
+    {
+        $this->userId = $event->getUserId();
+        $this->name = $event->getName();
+        $this->seekingAssistance = $event->getSeekingAssistance();
+        $this->offeringAssistance = $event->getOfferingAssistance();
+        $this->hashedPassword = $event->getHashedPassword() ?: null;
+        $this->updatedAt = $event->getUpdatedAt();
     }
 
 }

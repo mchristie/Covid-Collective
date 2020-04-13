@@ -6,11 +6,15 @@ use Illuminate\Http\Request;
 use Covid\Users\Domain\UsersQuery;
 use Covid\Users\Domain\UserRepository;
 use Covid\Users\Domain\UserId;
+use Covid\Users\Domain\SeekingAssistance;
 use Covid\Users\Domain\PhoneNumber;
 use Covid\Users\Domain\PasswordHelper;
 use Covid\Users\Domain\Password;
+use Covid\Users\Domain\OfferingAssistance;
+use Covid\Users\Domain\Name;
 use Covid\Users\Domain\Exceptions\EmailOrPhoneIsRequired;
 use Covid\Users\Domain\Email;
+use Covid\Users\Application\Commands\UpdateUser;
 use Covid\Shared\CommandBus;
 use Covid\Shared\BaseException;
 use Covid\Resources\Domain\Url;
@@ -25,6 +29,7 @@ use Covid\Resources\Application\Query\ResourcesQuery;
 use Covid\Resources\Application\Commands\CreateResource;
 use Covid\Groups\Application\Groups;
 use App\Mail\VolunteerSignedUp;
+use App\Http\Controllers\AuthController;
 
 Route::get('/', function (Request $request) {
     // return view('soon');
@@ -144,70 +149,50 @@ Route::get('/ways-to-help', function (Request $request) {
  * Users
  */
 
-Route::any('login', function(Request $request, UsersQuery $query, UserRepository $repo, PasswordHelper $passwordHelper) {
+Route::get('login', 'AuthController@getLoginOrRegister')->name('login');
 
-    $error = null;
-    $emailOrPhone = $request->get('emailOrPhone');
+Route::post('login', 'AuthController@postLoginOrRegister')->middleware('cache.headers:public;max_age=3600');
 
-    if ($request->getMethod() === 'POST' && $request->get('password')) {
-        $phone = null;
-        $email = null;
-
-        try {
-
-            if (strstr($emailOrPhone, '@')) {
-                $email = new Email($emailOrPhone);
-
-            } elseif (strstr($emailOrPhone, '7')) {
-                $phone = new PhoneNumber($emailOrPhone);
-
-            } else {
-                throw new EmailOrPhoneIsRequired();
-            }
-
-            $password = new Password($request->get('password'));
-
-            $user = $query->findByEmailOrPhoneNumber(
-                $email,
-                $phone,
-            );
-
-            $user = $repo->find(new UserId($user['id']));
-            
-            if ($user->checkPassword($password, $passwordHelper)) {
-                $request->session()->put('userId', $user->getAggregateRootId());
-                $request->session()->save();
-                
-                return redirect()->route('profile');
-            } else {
-                $error = 'Sorry, your password was incorrect';
-            }
-
-        } catch(BaseException $e) {
-            $error = $e->getName();
-
-        } catch(Exception $e) {
-            $error = $e->getMessage();
-        }
-    }
-
-    return view('login', [
-        'error' => $error,
-        'emailOrPhone' => $emailOrPhone
-    ]);
-})->name('login')->middleware('cache.headers:public;max_age=3600');
+Route::get('logout', 'AuthController@getLogout')->name('logout')->middleware('auth');
 
 Route::get('profile', function(Request $request, UsersQuery $query) {
-    if (!$request->session()->get('userId')) {
-        return redirect()->route('login');
-    };
-    
-    $user = $query->find(new UserId($request->session()->get('userId')));
-    
-    return view('profile', [
-        'user' => $user
+    return view('auth.profile', [
+        'user' => $request->user()
     ]);
-})->name('profile');
+})->name('profile')->middleware('auth');
+
+Route::post('profile', function(Request $request, CommandBus $commandBus) {
+    $error = null;
+    $success = null;
+    
+    $user = $request->user();
+
+    $command = new UpdateUser(
+        new UserId($user['id']),
+        new Name($request->get('name', $user['name'])),
+        new SeekingAssistance($request->get('seekingAssistance', 'NO')),
+        new OfferingAssistance($request->get('offeringAssistance', 'NO')),
+        $request->has('password') ? new Password($request->get('password')) : null,
+        new DateTimeImmutable()
+    );
+
+    try {
+        $commandBus->dispatch($command);
+
+        $success = 'Your changes were saved';
+    } catch(BaseException $e) {
+        $error = $e->getName();
+
+    } catch(Exception $e) {
+        $error = $e->getMessage();
+    }
+
+    return view('auth.profile', [
+        'user' => $request->user(),
+        'error' => $error,
+        'success' => $success,
+    ]);
+})->middleware('auth');;
 
 /*
  *  SEO
