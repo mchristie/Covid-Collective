@@ -9,17 +9,17 @@ jobs:
   API:
     runs-on: 'ubuntu-latest'
 
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE: test
-          MYSQL_ROOT_PASSWORD: root
-        ports:
-          - 3306
-          - 13306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    # services:
+    #   mysql:
+    #     image: mysql:5.7
+    #     env:
+    #       MYSQL_ALLOW_EMPTY_PASSWORD: yes
+    #       MYSQL_DATABASE: test
+    #       MYSQL_ROOT_PASSWORD: root
+    #     ports:
+    #       - 3306
+    #       - 13306
+    #     options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
 
@@ -37,18 +37,18 @@ jobs:
         composer install --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist --optimize-autoloader
         npm install
 
-    - name: Execute tests (Unit and Feature tests) via PHPUnit
-      run: |
-        php artisan migrate:refresh --seed
-        ./vendor/bin/phpunit
-      env:
-        APP_ENV: testing
-        DB_HOST: 127.0.0.1
-        DB_PORT: ${{ job.services.mysql.ports['3306'] }}
-        DB_DATABASE: test
-        DB_USERNAME: root
-        DB_PASSWORD: root
-        DB_ROOT_PASSWORD: root
+    # - name: Execute tests (Unit and Feature tests) via PHPUnit
+    #   run: |
+    #     php artisan migrate:refresh --seed
+    #     ./vendor/bin/phpunit
+    #   env:
+    #     APP_ENV: testing
+    #     DB_HOST: 127.0.0.1
+    #     DB_PORT: ${{ job.services.mysql.ports['3306'] }}
+    #     DB_DATABASE: test
+    #     DB_USERNAME: root
+    #     DB_PASSWORD: root
+    #     DB_ROOT_PASSWORD: root
 
     - name: Remove dev dependencies
       run: |
