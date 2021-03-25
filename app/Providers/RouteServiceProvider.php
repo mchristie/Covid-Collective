@@ -42,9 +42,11 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function map()
     {
-        Route::namespace($this->namespace)->prefix('api')->group(base_path('routes/api.php'));
+        // Route::namespace($this->namespace)->prefix('api')->group(base_path('routes/api.php'));
 
-        Route::namespace($this->namespace)->group(base_path('routes/web.php'));
+        // Route::namespace($this->namespace)->group(base_path('routes/web.php'));
+
+        Route::namespace($this->namespace)->group(base_path('routes/goodbye.php'));
     }
 
 }

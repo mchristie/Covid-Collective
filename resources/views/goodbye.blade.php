@@ -24,9 +24,10 @@
 
                 <h1>Covid Collective</h1>
 
-                <p class="text-muted">Launching soon</p>
+                <p class="text-muted">Thank you, and goodbye 👋🏻</p>
 
                 <p class="mt-5 text-muted text-small">
+                    If you would like to take over covid collective please get in touch
                     <a href="mailto:hello@covid-collective.co.uk">
                         hello@covid-collective.co.uk
                     </a>
