@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches:    
+    branches:
       - master
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-    
+
     - name: Checkout
       uses: actions/checkout@v1
 
@@ -34,7 +34,6 @@ jobs:
     - name: Install Dependencies, including dev dependencies
       run: |
         npm install serverless-pseudo-parameters
-        composer global require hirak/prestissimo --no-ansi --no-interaction --no-scripts --no-suggest --no-progress
         composer install --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist --optimize-autoloader
         npm install
 
@@ -50,13 +49,13 @@ jobs:
         DB_USERNAME: root
         DB_PASSWORD: root
         DB_ROOT_PASSWORD: root
-    
+
     - name: Remove dev dependencies
       run: |
         /bin/rm bootstrap/cache/*
         composer install --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --no-dev --prefer-dist --optimize-autoloader
         php artisan config:clear
-    
+
     - name: Build assets
       run: |
         npm run production
