@@ -53,7 +53,6 @@ jobs:
     - name: Remove dev dependencies
       run: |
         composer install --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --no-dev --prefer-dist --optimize-autoloader
-        /bin/rm bootstrap/cache/*
         php artisan config:clear
         npm install
 
