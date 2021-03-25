@@ -31,11 +31,11 @@ jobs:
       with:
         php-version: '7.4'
 
-    - name: Install Dependencies, including dev dependencies
-      run: |
-        npm install serverless-pseudo-parameters
-        composer install --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist --optimize-autoloader
-        npm install
+    # - name: Install Dependencies, including dev dependencies
+    #   run: |
+    #     npm install serverless-pseudo-parameters
+    #     composer install --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist --optimize-autoloader
+    #     npm install
 
     # - name: Execute tests (Unit and Feature tests) via PHPUnit
     #   run: |
@@ -52,9 +52,10 @@ jobs:
 
     - name: Remove dev dependencies
       run: |
-        /bin/rm bootstrap/cache/*
         composer install --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --no-dev --prefer-dist --optimize-autoloader
+        /bin/rm bootstrap/cache/*
         php artisan config:clear
+        npm install
 
     - name: Build assets
       run: |
